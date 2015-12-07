@@ -87,7 +87,7 @@ object Ingest {
 
     val conf = job.getConfiguration
 
-    sc.newAPIHadoopRDD(conf, classOf[RainfallInputFormat], classOf[SpaceTimeInputKey], classOf[Tile])
+    sc.newAPIHadoopRDD(conf, classOf[RainfallS3InputFormat], classOf[SpaceTimeInputKey], classOf[Tile])
   }
 
   def saveToS3(layerId: LayerId, rasterRDD: RasterRDD[SpaceTimeKey], layoutScheme: LayoutScheme, bucket: String, prefix: String): Unit = {

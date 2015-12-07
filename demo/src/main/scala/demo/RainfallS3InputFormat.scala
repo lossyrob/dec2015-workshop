@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input._
 import org.joda.time._
 import org.joda.time.format._
 
-class RainfallInputFormat extends S3InputFormat[SpaceTimeInputKey,Tile] {
+class RainfallS3InputFormat extends S3InputFormat[SpaceTimeInputKey,Tile] {
   def createRecordReader(split: InputSplit, context: TaskAttemptContext) = {
     new S3RecordReader[SpaceTimeInputKey,Tile] {
       def read(key: String, bytes: Array[Byte]) = {
