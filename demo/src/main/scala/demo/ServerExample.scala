@@ -1,4 +1,4 @@
-package sampleapp
+package demo
 
 import geotrellis.raster._
 import geotrellis.raster.histogram._
@@ -45,15 +45,15 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import com.github.nscala_time.time.Imports._
 
-object TimeSeriesExample {
+object ServerExample {
   val tilesPath = new java.io.File("data/tiles-wm").getAbsolutePath
 
   def main(args: Array[String]): Unit = {
-    implicit val system = akka.actor.ActorSystem("sampleapp-system")
+    implicit val system = akka.actor.ActorSystem("demo-system")
 
     val conf =
       new SparkConf()
-        .setAppName("SampleApp Ingest")
+        .setAppName("Demo Server")
         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .set("spark.kryo.registrator", "geotrellis.spark.io.hadoop.KryoRegistrator")
 
@@ -103,14 +103,14 @@ object TimeSeriesExample {
 
     // create and start our service actor
     val service =
-      system.actorOf(Props(classOf[TimeSeriesServiceActor], reader, metadataReader, sc), "sampleapp")
+      system.actorOf(Props(classOf[ServerExampleServiceActor], reader, metadataReader, sc), "demo")
 
     // start a new HTTP server on port 8088 with our service actor as the handler
     IO(Http) ! Http.Bind(service, "0.0.0.0", 8088)
   }
 }
 
-class TimeSeriesServiceActor(
+class ServerExampleServiceActor(
   reader: FilteringLayerReader[LayerId, SpaceTimeKey, RasterRDD[SpaceTimeKey]], 
   metadataReader: Reader[LayerId, RasterMetaData],
   sc: SparkContext) extends Actor with HttpService {
@@ -166,18 +166,6 @@ class TimeSeriesServiceActor(
               .reduce { (acc1, acc2) => (acc1._1 + acc2._1, acc1._2 + acc2._2) }
           
           zonalStatsReponse(layer.name, "mean", count / sum.toDouble)
-        }
-      } ~
-      path("yearly-mean") {
-        complete {
-          timeSeriesStatsReponse(layer.name, "yearly-mean",
-            tiles
-              .mapKeys { key => key.updateTemporalComponent(key.temporalKey.time.withMonthOfYear(1).withDayOfMonth(1).withHourOfDay(0)) }
-              .averageByKey
-              .zonalSummaryByKey(polygon, MeanResult(0.0, 0L), Mean, { k:SpaceTimeKey => k.temporalComponent.time })
-              .mapValues(_.mean)
-              .collect
-              .sortBy(_._1) )
         }
       }
   }

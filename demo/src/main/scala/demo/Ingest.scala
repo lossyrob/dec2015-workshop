@@ -1,4 +1,4 @@
-package sampleapp
+package demo
 
 import geotrellis.raster._
 import geotrellis.raster.resample._
@@ -33,7 +33,7 @@ object Ingest {
   def main(args: Array[String]): Unit = {
     val conf =
       new SparkConf()
-        .setAppName("SampleApp Ingest")
+        .setAppName("Demo Ingest")
         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
         .set("spark.kryo.registrator", "geotrellis.spark.io.hadoop.KryoRegistrator")
 

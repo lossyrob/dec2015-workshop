@@ -1,27 +1,27 @@
 #!/bin/sh
 
 spark-submit \
---class sampleapp.FindMinMaxTime \
+--class demo.FindMinMaxTime \
 --master mesos://zk://zookeeper.service.ksat-demo.internal:2181/mesos \
 --conf spark.executorEnv.SPARK_LOCAL_DIRS="/media/ephemeral0,/media/ephemeral1" \
-sampleapp-assembly-0.1.0.jar
+demo-assembly-0.1.0.jar
 
 ## Ingest S3
 spark-submit \
---class sampleapp.Ingest \
+--class demo.Ingest \
 --master mesos://zk://zookeeper.service.ksat-demo.internal:2181/mesos \
 --conf spark.executorEnv.SPARK_LOCAL_DIRS="/media/ephemeral0,/media/ephemeral1" \
 --conf spark.driver.cores=4 \
 --conf spark.driver.memory=4g \
 --conf spark.executor.memory=12g \
 --conf spark.mesos.coarse=true \
-sampleapp-assembly-0.1.0.jar \
+demo-assembly-0.1.0.jar \
 s3 \
 30
 
 ## Ingest Accumulo
 spark-submit \
---class sampleapp.Ingest \
+--class demo.Ingest \
 --master mesos://zk://zookeeper.service.ksat-demo.internal:2181/mesos \
 --conf spark.executorEnv.SPARK_LOCAL_DIRS="/media/ephemeral0,/media/ephemeral1" \
 --conf spark.executorEnv.SPARK_LOCAL_DIRS="/media/ephemeral0,/media/ephemeral1" \
@@ -31,13 +31,13 @@ spark-submit \
 --conf spark.mesos.coarse=true \
 --conf spark.storage.memoryFraction=0.3 \
 --conf spark.default.parallelism=50 \
-sampleapp-assembly-0.1.0.jar \
+demo-assembly-0.1.0.jar \
 accumulo \
 30
 
-## TimeSeriesExample S3
+## ServerExample S3
 spark-submit \
---class sampleapp.TimeSeriesExample \
+--class demo.ServerExample \
 --master mesos://zk://zookeeper.service.ksat-demo.internal:2181/mesos \
 --conf spark.executorEnv.SPARK_LOCAL_DIRS="/media/ephemeral0,/media/ephemeral1" \
 --conf spark.driver.cores=4 \
@@ -46,44 +46,44 @@ spark-submit \
 --conf spark.mesos.coarse=true \
 --conf spark.storage.memoryFraction=0.3 \
 --conf spark.default.parallelism=50 \
-sampleapp-assembly-0.1.0.jar \
+demo-assembly-0.1.0.jar \
 s3
 
-## TimeSeriesExample Accumulo
+## ServerExample Accumulo
 spark-submit \
---class sampleapp.TimeSeriesExample \
+--class demo.ServerExample \
 --master mesos://zk://zookeeper.service.ksat-demo.internal:2181/mesos \
 --conf spark.executorEnv.SPARK_LOCAL_DIRS="/media/ephemeral0,/media/ephemeral1" \
 --conf spark.driver.cores=4 \
 --conf spark.driver.memory=4g \
 --conf spark.executor.memory=12g \
 --conf spark.mesos.coarse=true \
-sampleapp-assembly-0.1.0.jar \
+demo-assembly-0.1.0.jar \
 accumulo
 
 spark-shell \
 --master mesos://zk://zookeeper.service.ksat-demo.internal:2181/mesos \
---jars sampleapp-assembly-0.1.0.jar
+--jars demo-assembly-0.1.0.jar
 
 ## local
 
 spark-submit \
---class sampleapp.FindMinMaxTime \
-target/scala-2.10/sampleapp-assembly-0.1.0.jar \
-file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/rainfall-wm
+--class demo.FindMinMaxTime \
+target/scala-2.10/demo-assembly-0.1.0.jar \
+file://`pwd`/sample-app/data/rainfall-wm
 
 spark-submit \
---class sampleapp.Ingest \
-target/scala-2.10/sampleapp-assembly-0.1.0.jar \
+--class demo.Ingest \
+target/scala-2.10/demo-assembly-0.1.0.jar \
 local \
-file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/rainfall-wm \
-file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/catalog
+file://`pwd`/sample-app/data/rainfall-wm \
+file://`pwd`/sample-app/data/catalog
 
 spark-submit \
---class sampleapp.TimeSeriesExample \
-target/scala-2.10/sampleapp-assembly-0.1.0.jar \
+--class demo.ServerExample \
+target/scala-2.10/demo-assembly-0.1.0.jar \
 local \
-file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/catalog
+file://`pwd`/sample-app/data/catalog
 
 
 
@@ -91,8 +91,8 @@ file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/catalog
 
 spark-submit \
 ../code/reproject_to_s3.py \
-file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/rainfall \
-file:///Users/rob/proj/workshops/ksat-workshop/sample-app/data/rainfall-wm \
+file://`pwd`/sample-app/data/rainfall \
+file://`pwd`/sample-app/data/rainfall-wm \
 --extension tif
 
 

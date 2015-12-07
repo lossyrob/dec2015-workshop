@@ -1,4 +1,4 @@
-package sampleapp
+package demo
 
 import geotrellis.raster._
 import geotrellis.raster.io.geotiff._
@@ -24,11 +24,11 @@ object SprayExample {
   })
 
   def main(args: Array[String]): Unit = {
-    implicit val system = akka.actor.ActorSystem("sampleapp-system")
+    implicit val system = akka.actor.ActorSystem("demo-system")
 
     // create and start our service actor
     val service =
-      system.actorOf(Props(classOf[SampleServiceActor]), "sampleapp")
+      system.actorOf(Props(classOf[SampleServiceActor]), "demo")
 
     // start a new HTTP server on port 8080 with our service actor as the handler
     IO(Http) ! Http.Bind(service, "localhost", 8080)

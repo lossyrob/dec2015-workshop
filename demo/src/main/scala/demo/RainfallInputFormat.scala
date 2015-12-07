@@ -1,4 +1,4 @@
-package sampleapp
+package demo
 
 import geotrellis.proj4._
 import geotrellis.raster._

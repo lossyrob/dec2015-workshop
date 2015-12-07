@@ -1,4 +1,4 @@
-name := "sampleapp"
+name := "demo"
 version := "0.1.0"
 scalaVersion := "2.10.5"
 crossScalaVersions := Seq("2.11.5", "2.10.5")

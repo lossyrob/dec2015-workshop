@@ -1,4 +1,4 @@
-package sampleapp
+package demo
 
 import geotrellis.spark.io.hadoop._
 import geotrellis.spark.io.hadoop.formats._

@@ -1,4 +1,4 @@
-package sampleapp
+package demo
 
 import geotrellis.raster._
 import geotrellis.raster.io.geotiff._
