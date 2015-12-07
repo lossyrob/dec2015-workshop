@@ -26,11 +26,10 @@ javaOptions += "-Xmx4G"
 fork in run := true
 
 libraryDependencies ++= Seq(
-//  "com.azavea.geotrellis" %% "geotrellis-raster" % "0.10.0-87fbc6e",
-  "com.azavea.geotrellis" %% "geotrellis-spark" % "0.10.0-SNAPSHOT",
-  "org.apache.spark" %% "spark-core" % "1.4.1",
-  "io.spray"        %% "spray-routing" % "1.3.2",
-  "io.spray"        %% "spray-can" % "1.3.2",
+  "com.azavea.geotrellis" %% "geotrellis-spark" % "0.10.0-SNAPSHOT", //"0.10.0-87fbc6e"
+  "org.apache.spark" %% "spark-core" % "1.5.2",
+  Dependencies.sprayRouting,
+  Dependencies.sprayCan,
   "org.scalatest"       %%  "scalatest"      % "2.2.0" % "test"
 )
 
@@ -45,3 +44,5 @@ assemblyMergeStrategy in assembly := {
   case "META-INF/ECLIPSEF.SF" => MergeStrategy.discard
   case _ => MergeStrategy.first
 }
+
+net.virtualvoid.sbt.graph.Plugin.graphSettings

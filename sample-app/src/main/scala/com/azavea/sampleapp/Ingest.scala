@@ -51,7 +51,12 @@ object Ingest {
     val splitSize = args(1).toInt
 
     try {
-      val layoutScheme = ZoomedLayoutScheme(WebMercator)
+      val layoutScheme = 
+        if(args(0) == "s3" )
+          FloatingLayoutScheme(1024)
+        else
+          FloatingLayoutScheme(512)
+
       val sourceTiles = loadSourceTiles(bucket, prefix, splitSize)
 
       val (zoom, rasterMetaData) =
@@ -86,13 +91,9 @@ object Ingest {
   }
 
   def saveToS3(layerId: LayerId, rasterRDD: RasterRDD[SpaceTimeKey], layoutScheme: LayoutScheme, bucket: String, prefix: String): Unit = {
-    val writer = S3LayerWriter[SpaceTimeKey, Tile, RasterRDD](bucket, prefix, ZCurveKeyIndexMethod.byYear)
-    val LayerId(name, zoom) = layerId
+    val writer = S3LayerWriter[SpaceTimeKey, Tile, RasterRDD](bucket, prefix, ZCurveKeyIndexMethod.by(DateTimeIndexValue), oneToOne = false)
 
-    Pyramid.upLevels(rasterRDD, layoutScheme, zoom) { (rdd, z) =>
-      writer.write(LayerId(name, z), rdd)
-      rdd
-    }
+    writer.write(layerId, rasterRDD)
   }
 
   def saveToAccumulo(layerId: LayerId, rasterRDD: RasterRDD[SpaceTimeKey], layoutScheme: LayoutScheme): Unit = {
@@ -100,18 +101,18 @@ object Ingest {
     val zooKeeper = "zookeeper.service.ksat-demo.internal"
     val user = "root"
     val password = new PasswordToken("secret")
-    val instance = AccumuloInstance(instanceName, zooKeeper, user, password)
-    val writer = AccumuloLayerWriter[SpaceTimeKey, Tile, RasterRDD](instance, "tiles", ZCurveKeyIndexMethod.byYear)
-    val LayerId(name, zoom) = layerId
 
-    Pyramid.upLevels(rasterRDD, layoutScheme, zoom) { (rdd, z) =>
-      writer.write(LayerId(name, z), rdd)
-      rdd
-    }
+    //val indexMethod = HilbertKeyIndexMethod(12)
+    val indexMethod = ZCurveKeyIndexMethod.by(DateTimeIndexValue)
+
+    val instance = AccumuloInstance(instanceName, zooKeeper, user, password)
+    val writer = AccumuloLayerWriter[SpaceTimeKey, Tile, RasterRDD](instance, "tiles", indexMethod)
+
+    writer.write(layerId, rasterRDD)
   }
 
   def callLocal(inputDir: String, localCatalog: String)(implicit sc: SparkContext) = {
-    val layoutScheme = ZoomedLayoutScheme(WebMercator)
+    val layoutScheme = FloatingLayoutScheme(512)
 
     val bucket = "ksat-test-1"
     val prefix = "rainfall-wm"
@@ -142,11 +143,6 @@ object Ingest {
 
   def saveToLocal(layerId: LayerId, rasterRDD: RasterRDD[SpaceTimeKey], layoutScheme: LayoutScheme, localCatalog: String): Unit = {
     val writer = HadoopLayerWriter[SpaceTimeKey, Tile, RasterRDD](localCatalog, ZCurveKeyIndexMethod.by(DateTimeIndexValue))
-    val LayerId(name, zoom) = layerId
-
-    Pyramid.upLevels(rasterRDD, layoutScheme, zoom, zoom) { (rdd, z) =>
-      writer.write(LayerId(name, z), rdd)
-      rdd
-    }
+    writer.write(layerId, rasterRDD)
   }
 }
