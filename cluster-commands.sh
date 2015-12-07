@@ -70,29 +70,29 @@ spark-shell \
 spark-submit \
 --class demo.FindMinMaxTime \
 target/scala-2.10/demo-assembly-0.1.0.jar \
-file://`pwd`/sample-app/data/rainfall-wm
+file://`pwd`/demo/data/rainfall-wm
 
 spark-submit \
 --class demo.Ingest \
 target/scala-2.10/demo-assembly-0.1.0.jar \
 local \
-file://`pwd`/sample-app/data/rainfall-wm \
-file://`pwd`/sample-app/data/catalog
+file://`pwd`/demo/data/rainfall-wm \
+file://`pwd`/demo/data/catalog
 
 spark-submit \
 --class demo.ServerExample \
 target/scala-2.10/demo-assembly-0.1.0.jar \
 local \
-file://`pwd`/sample-app/data/catalog
+file://`pwd`/demo/data/catalog
 
 
 
-
+## Running reproject locally
 
 spark-submit \
 ../code/reproject_to_s3.py \
-file://`pwd`/sample-app/data/rainfall \
-file://`pwd`/sample-app/data/rainfall-wm \
+file://`pwd`/demo/data/rainfall \
+file://`pwd`/demo/data/rainfall-wm \
 --extension tif
 
 
@@ -100,6 +100,8 @@ file://`pwd`/sample-app/data/rainfall-wm \
 
 config -t tiles -s table.split.threshold=100M
 compact -t tiles
+
+## Polygon for testing (Africa)
 
 {
     "type": "Polygon",
