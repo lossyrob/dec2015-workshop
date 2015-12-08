@@ -7,3 +7,7 @@ slides
 
 .ivy2
 .sbt
+
+.vagrant
+vagrant_home
+
