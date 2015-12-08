@@ -3,14 +3,20 @@ package demo
 import geotrellis.raster._
 import geotrellis.raster.io.geotiff._
 import geotrellis.raster.render._
+import com.typesafe.config.ConfigFactory
 
-object RasterExample {
+object CoreExample {
   val maskedPath = "data/r-ir.tif"
   val ndviPath = "data/ndvi.png"
 
   def main(args: Array[String]): Unit = {
-    // createMasked()
-    createNDVI()
+    if(args.length > 0) {
+      createNDVI()
+      println(s"Done. Created $ndviPath")
+    } else {
+      createMasked()
+      println(s"Done. Created $maskedPath")
+    }
   }
 
   def createMasked(): Unit = {
@@ -51,7 +57,7 @@ object RasterExample {
       }
     }
 
-    val cb = ColorBreaks.fromStringDouble("0:ffffe5ff;0.1:f7fcb9ff;0.2:d9f0a3ff;0.3:addd8eff;0.4:78c679ff;0.5:41ab5dff;0.6:238443ff;0.7:006837ff;1:004529ff").get
+    val cb = ColorBreaks.fromStringDouble(ConfigFactory.load().getString("demo.colorbreaks")).get
 
     ndvi.renderPng(cb).write(ndviPath)
   }

@@ -25,8 +25,10 @@ resolvers += Resolver.bintrayRepo("azavea", "geotrellis")
 javaOptions += "-Xmx4G"
 fork in run := true
 
+connectInput in run := true
+
 libraryDependencies ++= Seq(
-  "com.azavea.geotrellis" %% "geotrellis-spark" % "0.10.0-SNAPSHOT", //"0.10.0-87fbc6e"
+  "com.azavea.geotrellis" %% "geotrellis-spark" % "0.10.0-d8968b1",
   "org.apache.spark" %% "spark-core" % "1.5.2",
   Dependencies.sprayRouting,
   Dependencies.sprayCan,

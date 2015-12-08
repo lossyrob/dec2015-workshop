@@ -1,5 +1,5 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $DIR/.environment.sh
+source $DIR/environment.sh
 
 pushd ../
 aws s3 cp ./code/reproject_to_s3.py $CODE_TARGET/reproject_to_s3.py --region $AWS_REGION

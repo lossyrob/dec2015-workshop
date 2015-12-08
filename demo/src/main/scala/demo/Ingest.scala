@@ -57,7 +57,9 @@ object Ingest {
         else
           FloatingLayoutScheme(512)
 
-      val sourceTiles = loadSourceTiles(bucket, prefix, splitSize)
+      val sourceTiles = 
+        loadSourceTiles(bucket, prefix, splitSize)
+          .mapValues(_.convert(TypeUShort)) // Convert to UShort, no need for Float precision
 
       val (zoom, rasterMetaData) =
         RasterMetaData.fromRdd(sourceTiles, WebMercator, layoutScheme)(_.projectedExtent.extent)

@@ -15,9 +15,10 @@ import spray.routing.{HttpService, RequestContext}
 import spray.routing.directives.CachingDirectives
 import spray.http.MediaTypes
 import scala.concurrent._
+import com.typesafe.config.ConfigFactory
 
 object SprayExample {
-  val tilesPath = new java.io.File("data/tiles-wm").getAbsolutePath
+  val tilesPath = new java.io.File("data/tiles").getAbsolutePath
 
   val reader = new FileSlippyTileReader[MultiBandTile](tilesPath)({ (key, bytes) =>
     MultiBandGeoTiff(bytes).tile
@@ -42,15 +43,17 @@ class SampleServiceActor extends Actor with HttpService {
   def receive = runRoute(root)
 
   val colorBreaks = 
-    ColorBreaks.fromStringDouble("0:ffffe5ff;0.1:f7fcb9ff;0.2:d9f0a3ff;0.3:addd8eff;0.4:78c679ff;0.5:41ab5dff;0.6:238443ff;0.7:006837ff;1:004529ff").get
+    ColorBreaks.fromStringDouble(ConfigFactory.load().getString("demo.colorbreaks")).get
 
   def root =
     pathPrefix(IntNumber / IntNumber / IntNumber) { (zoom, x, y) =>
       respondWithMediaType(MediaTypes.`image/png`) {
         complete {
           future {
+
             val tile = SprayExample.reader.read(zoom, x, y)
-            val ndvi = 
+
+            val ndvi =
               tile.convert(TypeDouble).combineDouble(0, 1) { (r, ir) =>
                 if(isData(r) && isData(ir)) {
                   (ir - r) / (ir + r)
@@ -65,4 +68,3 @@ class SampleServiceActor extends Actor with HttpService {
       }
     }
 }
-

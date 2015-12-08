@@ -20,8 +20,8 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 
 object SparkExample {
-  val inputPath = fullPath("data/landsat-tiles-wm")
-  val outputPath = fullPath("data/tiles-wm")
+  val inputPath = fullPath("data/landsat-tiles")
+  val outputPath = fullPath("data/tiles")
 
   def main(args: Array[String]): Unit = {
     val conf =
@@ -35,6 +35,8 @@ object SparkExample {
 
     try {
       run(sc)
+      println("Hit enter to exit.")
+      readLine()
     } finally {
       sc.stop()
     }

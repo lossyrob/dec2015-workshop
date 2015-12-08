@@ -92,8 +92,10 @@ def save_tif_after_reprojection(src_tif_path, dst_dir):
 
     if parsed_target.scheme == "s3":
         # TODO: Move region name out to parameter
-        client = boto3.client("s3", config=Config(region_name="eu-central-1"))
-        # signatureVersion: 'v4'
+        if region:
+            client = boto3.client("s3", config=Config(region_name="eu-central-1"))
+        else:
+            client = boto3.client("s3")
 
         bucket = parsed_target.netloc
         key = os.path.join(parsed_target.path, filename)[1:]
@@ -194,7 +196,7 @@ def reproject_tif(src_tif_path_remote, src_tif_path, data_name, dst_crs):
     return dst_tif_path
 
 
-def process_tif(src_tif_path_remote, image_bytes, data_name, dst_crs, dst_path):
+def process_tif(src_tif_path_remote, image_bytes, data_name, dst_crs, dst_path, region):
     """Wrapper function that encapsulates the RDD transformation to process a GeoTiff
 
     High-level function that handles saving a tif locally, reprojecting it, saving
@@ -216,7 +218,7 @@ def process_tif(src_tif_path_remote, image_bytes, data_name, dst_crs, dst_path):
 
     try:
         dst_tif_path_local = reproject_tif(src_tif_path_remote, src_tif_path, data_name, dst_crs)
-        dst_tif_path_remote = save_tif_after_reprojection(dst_tif_path_local, dst_path)
+        dst_tif_path_remote = save_tif_after_reprojection(dst_tif_path_local, dst_path, region)
     finally:
         os.remove(src_tif_path)
         if dst_tif_path_local:
@@ -234,6 +236,7 @@ if __name__ == '__main__':
     parser.add_argument('--data-name', help='Optional identifer to prefix files with', default='')
     parser.add_argument('--dst-crs', help='CRS to reproject files to', default='EPSG:3857')
     parser.add_argument('--extension', help='Only consider files ending in this extension', default='')
+    parser.add_argument('--region', help='Region for the S3 client to use', default='')
 
     args = parser.parse_args()
 
@@ -247,7 +250,7 @@ if __name__ == '__main__':
 
     reprojected_tifs = raw_tifs.map(
         lambda (src_tif_path_remote, tif_bytes): process_tif(
-            src_tif_path_remote, tif_bytes, args.data_name, args.dst_crs, args.dst_dir
+            src_tif_path_remote, tif_bytes, args.data_name, args.dst_crs, args.dst_dir, args.region
         )
     )
 

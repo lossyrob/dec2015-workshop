@@ -188,7 +188,7 @@ class ServerExampleServiceActor(
           timeSeriesStatsReponse(layer.name, "raw",
             tiles
               .asRasters
-              .map { case (key, raster) => (key.time, raster.getDouble(p)) }
+              .map { case (key, raster) => (key.time, raster.getDoubleValueAtPoint(p)) }
               .collect
           )
         }
@@ -200,7 +200,7 @@ class ServerExampleServiceActor(
             layer.name, "max", 
             tiles
               .asRasters
-              .map { case (key, raster) => (key.time.withDayOfMonth(1).withHourOfDay(0), raster.getDouble(p)) }
+              .map { case (key, raster) => (key.time.withDayOfMonth(1).withHourOfDay(0), raster.getDoubleValueAtPoint(p)) }
               .reduceByKey(math.max)
               .collect
           )
@@ -218,7 +218,7 @@ class ServerExampleServiceActor(
             layer.name, "mean", 
             tiles
               .asRasters
-              .map { case (key, raster) => (key.time.withDayOfMonth(1).withHourOfDay(0), raster.get(point)) }
+              .map { case (key, raster) => (key.time.withDayOfMonth(1).withHourOfDay(0), raster.getValueAtPoint(point)) }
               .aggregateByKey((0.0, 0))(seqOp, combineOp)
               .mapValues { case (sum, count) => sum / count.toDouble }
               .collect
